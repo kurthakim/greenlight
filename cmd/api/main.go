@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -43,6 +44,7 @@ type application struct {
 	logger *jsonlog.Logger
 	models data.Models
 	mailer mailer.Mailer
+	wg     sync.WaitGroup
 }
 
 func main() {
@@ -61,8 +63,8 @@ func main() {
 
 	flag.StringVar(&cfg.smtp.host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP host")
 	flag.IntVar(&cfg.smtp.port, "smtp-port", 2525, "SMPT port")
-	flag.StringVar(&cfg.smtp.username, "smtp-username", "", "SMTP username") // Fill in username
-	flag.StringVar(&cfg.smtp.password, "smtp-password", "", "SMTP password") // Fill in password
+	flag.StringVar(&cfg.smtp.username, "smtp-username", os.Getenv("GREENLIGHT_USERNAME"), "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", os.Getenv("GREENLIGHT_PASSWORD"), "SMTP password")
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.kurt.net>", "SMTP sender")
 
 	flag.Parse()
